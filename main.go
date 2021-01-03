@@ -5,11 +5,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
+	"os/exec"
 	"strings"
 	"text/template"
 
 	"github.com/Masterminds/sprig"
+	"github.com/mattn/go-colorable"
 	"github.com/mercari/tfnotify/config"
 	"github.com/mercari/tfnotify/notifier"
 	"github.com/mercari/tfnotify/notifier/github"
@@ -232,6 +235,51 @@ func (t *tfnotify) Run(ctx context.Context) error {
 	return NewExitError(notifier.Notify(ctx, tee(os.Stdin, os.Stdout)))
 }
 
+// Exec sends the notification with notifier
+func (t *tfnotify) Exec(ctx context.Context) error {
+	ciname := t.config.CI
+	if t.context.String("ci") != "" {
+		ciname = t.context.String("ci")
+	}
+	ciname = strings.ToLower(ciname)
+	ci, err := getCI(ciname)
+	if err != nil {
+		return err
+	}
+
+	selectedNotifier := t.config.GetNotifierType()
+	if t.context.String("notifier") != "" {
+		selectedNotifier = t.context.String("notifier")
+	}
+
+	ntf, err := t.getNotifier(ctx, ci, selectedNotifier)
+	if err != nil {
+		return err
+	}
+
+	if ntf == nil {
+		return errors.New("no notifier specified at all")
+	}
+
+	args := t.context.Args()
+	cmd := exec.CommandContext(ctx, args.First(), args.Tail()...) //nolint:gosec
+	stdout := &bytes.Buffer{}
+	uncolorize := colorable.NewNonColorable(stdout)
+	stderr := &bytes.Buffer{}
+	combinedOutput := &bytes.Buffer{}
+	cmd.Stdout = io.MultiWriter(os.Stdout, uncolorize, combinedOutput)
+	cmd.Stderr = io.MultiWriter(os.Stderr, stderr, combinedOutput)
+	_ = cmd.Run()
+
+	return NewExitError(cmd.ProcessState.ExitCode(), ntf.Exec(ctx, notifier.ParamExec{
+		Stdout:         stdout.String(),
+		Stderr:         stderr.String(),
+		CombinedOutput: combinedOutput.String(),
+		Cmd:            cmd,
+		Args:           args,
+	}))
+}
+
 func main() {
 	app := cli.NewApp()
 	app.Name = name
@@ -294,6 +342,38 @@ func main() {
 				&cli.StringFlag{
 					Name:  "message, m",
 					Usage: "Specify the message to use for notification",
+				},
+			},
+		},
+		{
+			Name:   "exec",
+			Usage:  "execute terraform command",
+			Action: cmdApply,
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:  "title, t",
+					Usage: "Specify the title to use for notification",
+				},
+				&cli.StringFlag{
+					Name:  "message, m",
+					Usage: "Specify the message to use for notification",
+				},
+			},
+			Subcommands: []*cli.Command{
+				{
+					Name:   "plan",
+					Usage:  "Parse a plan result",
+					Action: cmdExecPlan,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name:  "destroy-warning-title",
+							Usage: "Specify the title to use for destroy warning notification",
+						},
+						&cli.StringFlag{
+							Name:  "destroy-warning-message",
+							Usage: "Specify the message to use for destroy warning notification",
+						},
+					},
 				},
 			},
 		},
@@ -383,4 +463,24 @@ func cmdApply(ctx *cli.Context) error {
 		template: terraform.NewApplyTemplate(cfg.Terraform.Apply.Template),
 	}
 	return t.Run(ctx.Context)
+}
+
+func cmdExecPlan(ctx *cli.Context) error {
+	cfg, err := newConfig(ctx)
+	if err != nil {
+		return err
+	}
+
+	// If when_destroy is not defined in configuration, tfnotify should not notify it
+	warnDestroy := cfg.Terraform.Plan.WhenDestroy.Template != ""
+
+	t := &tfnotify{
+		config:                 cfg,
+		context:                ctx,
+		parser:                 terraform.NewPlanParser(),
+		template:               terraform.NewPlanTemplate(cfg.Terraform.Plan.Template),
+		destroyWarningTemplate: terraform.NewDestroyWarningTemplate(cfg.Terraform.Plan.WhenDestroy.Template),
+		warnDestroy:            warnDestroy,
+	}
+	return t.Exec(ctx.Context)
 }

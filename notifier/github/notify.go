@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/mercari/tfnotify/notifier"
 	"github.com/mercari/tfnotify/terraform"
 )
 
@@ -177,4 +178,124 @@ func (g *NotifyService) removeResultLabels(ctx context.Context, label string) (s
 	}
 
 	return labelColor, nil
+}
+
+func (g *NotifyService) Exec(ctx context.Context, param notifier.ParamExec) error {
+	cfg := g.client.Config
+	parser := g.client.Config.Parser
+	template := g.client.Config.Template
+
+	result := parser.Parse(param.Stdout)
+	result.ExitCode = param.Cmd.ProcessState.ExitCode()
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.Result == "" {
+		return result.Error
+	}
+
+	_, isPlan := parser.(*terraform.PlanParser)
+	if isPlan {
+		if result.HasDestroy && cfg.WarnDestroy {
+			// Notify destroy warning as a new comment before normal plan result
+			if err := g.notifyDestoryWarning(ctx, param.Stdout, result); err != nil {
+				return err
+			}
+		}
+		if cfg.PR.IsNumber() && cfg.ResultLabels.HasAnyLabelDefined() {
+			var (
+				labelToAdd string
+				labelColor string
+			)
+
+			switch {
+			case result.HasAddOrUpdateOnly:
+				labelToAdd = cfg.ResultLabels.AddOrUpdateLabel
+				labelColor = cfg.ResultLabels.AddOrUpdateLabelColor
+			case result.HasDestroy:
+				labelToAdd = cfg.ResultLabels.DestroyLabel
+				labelColor = cfg.ResultLabels.DestroyLabelColor
+			case result.HasNoChanges:
+				labelToAdd = cfg.ResultLabels.NoChangesLabel
+				labelColor = cfg.ResultLabels.NoChangesLabelColor
+			case result.HasPlanError:
+				labelToAdd = cfg.ResultLabels.PlanErrorLabel
+				labelColor = cfg.ResultLabels.PlanErrorLabelColor
+			}
+
+			currentLabelColor, err := g.removeResultLabels(ctx, labelToAdd)
+			if err != nil {
+				return err
+			}
+
+			if labelToAdd != "" {
+				if currentLabelColor == "" {
+					labels, _, err := g.client.API.IssuesAddLabels(ctx, cfg.PR.Number, []string{labelToAdd})
+					if err != nil {
+						return err
+					}
+					if labelColor != "" {
+						// set the color of label
+						for _, label := range labels {
+							if labelToAdd == label.GetName() {
+								if label.GetColor() != labelColor {
+									_, _, err := g.client.API.IssuesUpdateLabel(ctx, labelToAdd, labelColor)
+									if err != nil {
+										return err
+									}
+								}
+							}
+						}
+					}
+				} else if labelColor != "" && labelColor != currentLabelColor {
+					// set the color of label
+					_, _, err := g.client.API.IssuesUpdateLabel(ctx, labelToAdd, labelColor)
+					if err != nil {
+						return err
+					}
+				}
+			}
+		}
+	}
+
+	template.SetValue(terraform.CommonTemplate{
+		Title:        cfg.PR.Title,
+		Message:      cfg.PR.Message,
+		Result:       result.Result,
+		Body:         param.Stdout,
+		Link:         cfg.CI,
+		UseRawOutput: cfg.UseRawOutput,
+		Vars:         cfg.Vars,
+		Stderr:       param.Stderr,
+	})
+	body, err := template.Execute()
+	if err != nil {
+		return err
+	}
+
+	value := template.GetValue()
+
+	if cfg.PR.IsNumber() {
+		g.client.Comment.DeleteDuplicates(ctx, value.Title)
+	}
+
+	_, isApply := parser.(*terraform.ApplyParser)
+	if isApply {
+		prNumber, err := g.client.Commits.MergedPRNumber(ctx, cfg.PR.Revision)
+		if err == nil {
+			cfg.PR.Number = prNumber
+		} else if !cfg.PR.IsNumber() {
+			commits, err := g.client.Commits.List(ctx, cfg.PR.Revision)
+			if err != nil {
+				return err
+			}
+			lastRevision, _ := g.client.Commits.lastOne(commits, cfg.PR.Revision)
+			cfg.PR.Revision = lastRevision
+		}
+	}
+
+	return g.client.Comment.Post(ctx, body, PostOptions{
+		Number:   cfg.PR.Number,
+		Revision: cfg.PR.Revision,
+	})
 }

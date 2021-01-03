@@ -111,6 +111,7 @@ type CommonTemplate struct {
 	Link         string
 	UseRawOutput bool
 	Vars         map[string]string
+	Stderr       string
 }
 
 // DefaultTemplate is a default template for terraform commands
