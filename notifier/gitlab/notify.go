@@ -3,12 +3,18 @@ package gitlab
 import (
 	"context"
 
+	"github.com/mercari/tfnotify/notifier"
 	"github.com/mercari/tfnotify/terraform"
 )
 
 // NotifyService handles communication with the notification related
 // methods of GitHub API
 type NotifyService service
+
+func (g *NotifyService) Exec(ctx context.Context, param notifier.ParamExec) error {
+	_, err := g.Notify(ctx, param.Stdout)
+	return err
+}
 
 // Notify posts comment optimized for notifications
 func (g *NotifyService) Notify(ctx context.Context, body string) (exit int, err error) {

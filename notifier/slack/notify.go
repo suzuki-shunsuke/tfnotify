@@ -5,12 +5,18 @@ import (
 	"errors"
 
 	"github.com/lestrrat-go/slack/objects"
+	"github.com/mercari/tfnotify/notifier"
 	"github.com/mercari/tfnotify/terraform"
 )
 
 // NotifyService handles communication with the notification related
 // methods of Slack API
 type NotifyService service
+
+func (s *NotifyService) Exec(ctx context.Context, param notifier.ParamExec) error {
+	_, err := s.Notify(ctx, param.Stdout)
+	return err
+}
 
 // Notify posts comment optimized for notifications
 func (s *NotifyService) Notify(ctx context.Context, body string) (exit int, err error) {

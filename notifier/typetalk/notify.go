@@ -4,11 +4,17 @@ import (
 	"context"
 	"errors"
 
+	"github.com/mercari/tfnotify/notifier"
 	"github.com/mercari/tfnotify/terraform"
 )
 
 // NotifyService handles notification process.
 type NotifyService service
+
+func (s *NotifyService) Exec(ctx context.Context, param notifier.ParamExec) error {
+	_, err := s.Notify(ctx, param.Stdout)
+	return err
+}
 
 // Notify posts message to Typetalk.
 func (s *NotifyService) Notify(ctx context.Context, body string) (exit int, err error) {
