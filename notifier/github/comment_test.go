@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/google/go-github/github"
+	"github.com/google/go-github/v33/github"
 )
 
 func TestCommentPost(t *testing.T) {

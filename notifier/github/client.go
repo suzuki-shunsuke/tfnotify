@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/google/go-github/github"
+	"github.com/google/go-github/v33/github"
 	"github.com/mercari/tfnotify/terraform"
 	"golang.org/x/oauth2"
 )
