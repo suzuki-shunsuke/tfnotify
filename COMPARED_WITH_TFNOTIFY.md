@@ -7,7 +7,7 @@
 * support template functions [sprig](http://masterminds.github.io/sprig/)
 * support to pass variables by -var option
 * support to find the configuration file recursively
-* support --version option
+* support --version option and version command
 
 ### don't recreate labels
 
@@ -44,6 +44,9 @@ TO BE
 
 ```
 $ tfnotify --version
+tfnotify version 1.3.3
+
+$ tfnotify version
 tfnotify version 1.3.3
 ```
 
