@@ -59,6 +59,7 @@ Supported platform
   * CircleCI
   * CodeBuild
   * GitHub Actions
+  * Drone
 * Notifier
   * GitHub
 
