@@ -14,10 +14,11 @@ import (
 
 // Config is for tfnotify config structure
 type Config struct {
-	CI        string            `yaml:"ci"`
-	Notifier  Notifier          `yaml:"notifier"`
-	Terraform Terraform         `yaml:"terraform"`
-	Vars      map[string]string `yaml:"-"`
+	CI                    string            `yaml:"ci"`
+	Notifier              Notifier          `yaml:"notifier"`
+	Terraform             Terraform         `yaml:"terraform"`
+	Vars                  map[string]string `yaml:"-"`
+	KeepDuplicateComments bool              `yaml:"keep_duplicate_comments"`
 
 	path string
 }

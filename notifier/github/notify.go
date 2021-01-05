@@ -106,7 +106,9 @@ func (g *NotifyService) Notify(ctx context.Context, body string) (exit int, err 
 	value := template.GetValue()
 
 	if cfg.PR.IsNumber() {
-		g.client.Comment.DeleteDuplicates(ctx, value.Title)
+		if !cfg.KeepDuplicateComments {
+			g.client.Comment.DeleteDuplicates(ctx, value.Title)
+		}
 	}
 
 	_, isApply := parser.(*terraform.ApplyParser)

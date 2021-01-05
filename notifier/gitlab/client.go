@@ -33,15 +33,16 @@ type Client struct {
 
 // Config is a configuration for GitHub client
 type Config struct {
-	Token     string
-	BaseURL   string
-	NameSpace string
-	Project   string
-	MR        MergeRequest
-	CI        string
-	Parser    terraform.Parser
-	Template  terraform.Template
-	Vars      map[string]string
+	Token                 string
+	BaseURL               string
+	NameSpace             string
+	Project               string
+	MR                    MergeRequest
+	CI                    string
+	Parser                terraform.Parser
+	Template              terraform.Template
+	Vars                  map[string]string
+	KeepDuplicateComments bool
 }
 
 // MergeRequest represents GitLab Merge Request metadata
