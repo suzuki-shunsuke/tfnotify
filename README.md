@@ -15,6 +15,12 @@ We have sent [some pull requests](https://github.com/mercari/tfnotify/pulls/suzu
 
 We forked mercari/tfnotify v0.7.0 [fb178d8](https://github.com/mercari/tfnotify/tree/fb178d8a5a51f88a51b7fda93ed5443ff56dfc8f).
 
+## Compared with tfnotify
+
+Please see [Compared with mercari/tfnotify](COMPARED_WITH_TFNOTIFY.md).
+
+**We recommend to read [Compared with mercari/tfnotify](COMPARED_WITH_TFNOTIFY.md) because there are some features which aren't described at README.**
+
 ## Motivation
 
 There are commands such as `plan` and `apply` on Terraform command, but many developers think they would like to check if the execution of those commands succeeded.
