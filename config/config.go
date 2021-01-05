@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/suzuki-shunsuke/go-ci-env/cienv"
 	"github.com/suzuki-shunsuke/go-findconfig/findconfig"
 	"gopkg.in/yaml.v2"
 )
@@ -131,6 +132,29 @@ func (cfg *Config) LoadFile(path string) error {
 	return yaml.Unmarshal(raw, cfg)
 }
 
+func (cfg *Config) Complement() {
+	var platform cienv.Platform
+	if cfg.CI == "" {
+		platform = cienv.Get()
+		if platform != nil {
+			cfg.CI = platform.CI()
+		}
+	} else {
+		platform = cienv.GetByName(cfg.CI)
+	}
+	if platform == nil {
+		return
+	}
+	if cfg.isDefinedGithub() {
+		if cfg.Notifier.Github.Repository.Owner == "" {
+			cfg.Notifier.Github.Repository.Owner = platform.RepoOwner()
+		}
+		if cfg.Notifier.Github.Repository.Name == "" {
+			cfg.Notifier.Github.Repository.Name = platform.RepoName()
+		}
+	}
+}
+
 // Validation validates config file
 func (cfg *Config) Validation() error {
 	switch strings.ToLower(cfg.CI) {
@@ -158,6 +182,17 @@ func (cfg *Config) Validation() error {
 		return fmt.Errorf("%s: not supported yet", cfg.CI)
 	}
 	if cfg.isDefinedGithub() {
+		platform := cienv.GetByName(cfg.CI)
+
+		if platform != nil {
+			if cfg.Notifier.Github.Repository.Owner == "" {
+				cfg.Notifier.Github.Repository.Owner = platform.RepoOwner()
+			}
+			if cfg.Notifier.Github.Repository.Name == "" {
+				cfg.Notifier.Github.Repository.Name = platform.RepoName()
+			}
+		}
+
 		if cfg.Notifier.Github.Repository.Owner == "" {
 			return errors.New("repository owner is missing")
 		}
