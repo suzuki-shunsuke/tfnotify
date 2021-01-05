@@ -339,6 +339,7 @@ func newConfig(ctx *cli.Context) (config.Config, error) {
 		return cfg, err
 	}
 	cfg.Vars = vm
+	cfg.Complement()
 	if err := cfg.Validation(); err != nil {
 		return cfg, err
 	}

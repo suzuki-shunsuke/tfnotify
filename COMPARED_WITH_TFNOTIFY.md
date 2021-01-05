@@ -50,6 +50,32 @@ $ tfnotify version
 tfnotify version 1.3.3
 ```
 
+### complement CI and GitHub Repository owner and name from environment variables
+
+The configuration of CI and GitHub Repository owner and name is complemented by CI builtin environment variables.
+[suzuki-shunsuke/go-ci-env](https://github.com/suzuki-shunsuke/go-ci-env) is used to complement them.
+So currently, this feature doesn't support Google CloudBuild for now.
+
+AS IS
+
+```yaml
+ci: circleci
+notifier:
+  github:
+    token: $GITHUB_TOKEN
+    repository:
+      owner: suzuki-shunsuke
+      name: tfcmt
+```
+
+We can omit `ci` and `repository`.
+
+```yaml
+notifier:
+  github:
+    token: $GITHUB_TOKEN
+```
+
 ## Others
 
 * refactoring
