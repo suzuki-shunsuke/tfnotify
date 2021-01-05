@@ -35,15 +35,16 @@ type Client struct {
 
 // Config is a configuration for GitHub client
 type Config struct {
-	Token        string
-	BaseURL      string
-	Owner        string
-	Repo         string
-	PR           PullRequest
-	CI           string
-	Parser       terraform.Parser
-	UseRawOutput bool
-	WarnDestroy  bool
+	Token                 string
+	BaseURL               string
+	Owner                 string
+	Repo                  string
+	PR                    PullRequest
+	CI                    string
+	Parser                terraform.Parser
+	UseRawOutput          bool
+	WarnDestroy           bool
+	KeepDuplicateComments bool
 	// Template is used for all Terraform command output
 	Template terraform.Template
 	// DestroyWarningTemplate is used only for additional warning

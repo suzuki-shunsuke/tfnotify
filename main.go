@@ -139,6 +139,7 @@ func (t *tfnotify) getNotifier(ctx context.Context, ci CI, selectedNotifier stri
 			WarnDestroy:            t.warnDestroy,
 			ResultLabels:           labels,
 			Vars:                   t.config.Vars,
+			KeepDuplicateComments:  t.config.KeepDuplicateComments,
 		})
 		if err != nil {
 			return nil, err
@@ -156,10 +157,11 @@ func (t *tfnotify) getNotifier(ctx context.Context, ci CI, selectedNotifier stri
 				Title:    t.context.String("title"),
 				Message:  t.context.String("message"),
 			},
-			CI:       ci.URL,
-			Parser:   t.parser,
-			Template: t.template,
-			Vars:     t.config.Vars,
+			CI:                    ci.URL,
+			Parser:                t.parser,
+			Template:              t.template,
+			Vars:                  t.config.Vars,
+			KeepDuplicateComments: t.config.KeepDuplicateComments,
 		})
 		if err != nil {
 			return nil, err

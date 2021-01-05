@@ -8,6 +8,7 @@
 * support to pass variables by -var option
 * support to find the configuration file recursively
 * support --version option and version command
+* support `keep_duplicate_comments` to keep duplicate comments
 
 ### don't recreate labels
 
@@ -82,6 +83,19 @@ We can omit `ci` and `repository`.
 notifier:
   github:
     token: $GITHUB_TOKEN
+```
+
+### support `keep_duplicate_comments` to keep duplicate comments
+
+tfnotify deletes duplicated comments at GitHub and GitLab.
+But by setting `keep_duplicate_comments: true`, tfnotify doesn't remove them.
+
+```yaml
+notifier:
+  github:
+    token: $GITHUB_TOKEN
+keep_duplicate_comments: true
+# ...
 ```
 
 ## Others
