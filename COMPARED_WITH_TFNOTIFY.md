@@ -17,7 +17,7 @@ suzuki-shunsuke/tfnotify is compatible with mercari/tfnotify.
 
 ## Support `keep_duplicate_comments` to keep duplicate comments
 
-tfnotify deletes duplicated comments at GitHub and GitLab.
+tfnotify deletes duplicate comments at GitHub and GitLab.
 But by setting `keep_duplicate_comments: true`, tfnotify doesn't remove them.
 
 ```yaml
