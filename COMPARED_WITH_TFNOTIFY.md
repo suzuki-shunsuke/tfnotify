@@ -11,6 +11,8 @@ suzuki-shunsuke/tfnotify is compatible with mercari/tfnotify.
   * [Support to pass variables by -var option](#support-to-pass-variables-by--var-option)
   * [Don't recreate labels](#dont-recreate-labels)
   * [--version option and version command](#--version-option-and-version-command)
+* Fixes
+  * [Post a comment even if it failed to update GitHub Pull Request labels](#fix-post-a-comment-even-if-it-failed-to-update-github-pull-request-labels)
 * Others
   * refactoring
   * update urfave/cli to v2
@@ -103,3 +105,12 @@ tfnotify version 1.3.3
 $ tfnotify version
 tfnotify version 1.3.3
 ```
+
+## Fix: Post a comment even if it failed to update GitHub Pull Request labels
+
+[#56](https://github.com/suzuki-shunsuke/tfnotify/pull/56)
+
+mercari/tfnotify doesn't post a comment when it failed to update GitHub Pull Request labels.
+For example, when the label length is too long, tfnotify failed to add the label and the comment isn't posted.
+
+On the other hand, suzuki-shunsuke/tfnotify outputs the error log but the process continues even if it failed to update labels.
