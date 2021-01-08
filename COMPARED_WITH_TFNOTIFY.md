@@ -32,6 +32,8 @@ keep_duplicate_comments: true
 
 ## Find the configuration file recursively
 
+[#19](https://github.com/suzuki-shunsuke/tfnotify/pull/19)
+
 tfnotify searches the configuration file from the current directory to the root directory recursively.
 
 ## Complement CI and GitHub Repository owner and name from environment variables
@@ -71,16 +73,23 @@ notifier:
 
 ## Support to configure label colors
 
+[98547135a6d37b11b641feb399eec17721fe0bc0](https://github.com/suzuki-shunsuke/tfnotify/commit/98547135a6d37b11b641feb399eec17721fe0bc0)
+[49ea5c3a8c01e53cac6d3b529bd5d9907c41e9d3](https://github.com/suzuki-shunsuke/tfnotify/commit/49ea5c3a8c01e53cac6d3b529bd5d9907c41e9d3)
+
 tfnotify supports to configure label colors.
 So we don't have to configure label colors manually.
 This feature is useful especially for Monorepo.
 
 ## Support to pass variables by -var option
 
+[#29](https://github.com/suzuki-shunsuke/tfnotify/pull/29)
+
 tfnotify supports to pass variables to template by `-var <name>:<value>` options.
 We can access the variable in the template by `{{.Vars.<variable name>}}`.
 
 ## Don't recreate labels
+
+[#32](https://github.com/suzuki-shunsuke/tfnotify/pull/32)
 
 If the label which tfnotify set is already set to a pull request, mercari/tfnotify removes the label from the pull request and re-adds the same label to the pull request.
 This is meaningless.
@@ -88,6 +97,9 @@ This is meaningless.
 So suzuki-shunsuke/tfnotify doesn't recreate a label.
 
 ## --version option and version command
+
+[#4](https://github.com/suzuki-shunsuke/tfnotify/pull/4)
+[#44](https://github.com/suzuki-shunsuke/tfnotify/pull/44)
 
 AS IS
 
