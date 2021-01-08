@@ -2,6 +2,7 @@ package github
 
 import (
 	"context"
+	"log"
 	"net/http"
 
 	"github.com/mercari/tfnotify/terraform"
@@ -56,23 +57,22 @@ func (g *NotifyService) Notify(ctx context.Context, body string) (exit int, err 
 
 			currentLabelColor, err := g.removeResultLabels(ctx, labelToAdd)
 			if err != nil {
-				return result.ExitCode, err
+				log.Printf("[ERROR][tfnotify] remove labels: %v", err)
 			}
 
 			if labelToAdd != "" {
 				if currentLabelColor == "" {
 					labels, _, err := g.client.API.IssuesAddLabels(ctx, cfg.PR.Number, []string{labelToAdd})
 					if err != nil {
-						return result.ExitCode, err
+						log.Printf("[ERROR][tfnotify] add a label %s: %v", labelToAdd, err)
 					}
 					if labelColor != "" {
 						// set the color of label
 						for _, label := range labels {
 							if labelToAdd == label.GetName() {
 								if label.GetColor() != labelColor {
-									_, _, err := g.client.API.IssuesUpdateLabel(ctx, labelToAdd, labelColor)
-									if err != nil {
-										return result.ExitCode, err
+									if _, _, err := g.client.API.IssuesUpdateLabel(ctx, labelToAdd, labelColor); err != nil {
+										log.Printf("[ERROR][tfnotify] update a label color(name: %s, color: %s): %v", labelToAdd, labelColor, err)
 									}
 								}
 							}
@@ -80,9 +80,8 @@ func (g *NotifyService) Notify(ctx context.Context, body string) (exit int, err 
 					}
 				} else if labelColor != "" && labelColor != currentLabelColor {
 					// set the color of label
-					_, _, err := g.client.API.IssuesUpdateLabel(ctx, labelToAdd, labelColor)
-					if err != nil {
-						return result.ExitCode, err
+					if _, _, err := g.client.API.IssuesUpdateLabel(ctx, labelToAdd, labelColor); err != nil {
+						log.Printf("[ERROR][tfnotify] update a label color(name: %s, color: %s): %v", labelToAdd, labelColor, err)
 					}
 				}
 			}
