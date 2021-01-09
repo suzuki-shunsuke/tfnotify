@@ -12,6 +12,7 @@ require (
 	github.com/lestrrat-go/slack v0.0.0-20190827134815-1aaae719550a
 	github.com/mattn/go-colorable v0.1.8
 	github.com/nulab/go-typetalk v2.1.1+incompatible
+	github.com/nulab/go-typetalk/v3 v3.2.0
 	github.com/suzuki-shunsuke/go-ci-env v1.1.0
 	github.com/suzuki-shunsuke/go-findconfig v1.0.0
 	github.com/urfave/cli/v2 v2.3.0
