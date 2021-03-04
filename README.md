@@ -21,6 +21,12 @@ Please see [Compared with mercari/tfnotify](COMPARED_WITH_TFNOTIFY.md).
 
 **We recommend to read [Compared with mercari/tfnotify](COMPARED_WITH_TFNOTIFY.md) because there are some features which aren't described at README.**
 
+## Compared with tfcmt
+
+In addition to suzuki-shunsuke/tfnotify, we develop [tfcmt](https://github.com/suzuki-shunsuke/tfcmt) too.
+tfcmt isn't compatible with tfnotify and doesn't support some platform, but provides some attractive features aggresively.
+Please see the [document](https://github.com/suzuki-shunsuke/tfcmt/blob/master/COMPARED_WITH_TFNOTIFY.md) too.
+
 ## Motivation
 
 There are commands such as `plan` and `apply` on Terraform command, but many developers think they would like to check if the execution of those commands succeeded.
