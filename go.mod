@@ -9,7 +9,7 @@ require (
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/lestrrat-go/slack v0.0.0-20190827134815-1aaae719550a
-	github.com/mattn/go-colorable v0.1.8
+	github.com/mattn/go-colorable v0.1.12
 	github.com/nulab/go-typetalk v2.1.1+incompatible
 	github.com/suzuki-shunsuke/go-ci-env v1.1.0
 	github.com/suzuki-shunsuke/go-findconfig v1.0.0
