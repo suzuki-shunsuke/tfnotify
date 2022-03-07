@@ -12,7 +12,7 @@ require (
 	github.com/mattn/go-colorable v0.1.8
 	github.com/nulab/go-typetalk v2.1.1+incompatible
 	github.com/suzuki-shunsuke/go-ci-env v1.1.0
-	github.com/suzuki-shunsuke/go-findconfig v1.0.0
+	github.com/suzuki-shunsuke/go-findconfig v1.1.0
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/xanzy/go-gitlab v0.22.3
 	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa // indirect
